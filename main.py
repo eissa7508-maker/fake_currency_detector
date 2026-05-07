@@ -7,7 +7,9 @@ import tflite_runtime.interpreter as tflite
 app = FastAPI()
 
 # تحميل موديل TFLite
-interpreter = tflite.Interpreter(model_path="currency_model.tflite")
+import os
+model_path = os.path.join(os.path.dirname(__file__), "currency_model.tflite")
+interpreter = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()

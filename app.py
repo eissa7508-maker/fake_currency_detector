@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # 1. تحميل النموذج (تأكد من وضع ملف النموذج بجانب هذا الملف)
 # استبدل 'model.h5' باسم ملف نموذجك الحقيقي
-MODEL_PATH = 'model.h5' 
+MODEL_PATH = 'currency_model.h5' 
 model = load_model(MODEL_PATH)
 
 # 2. دالة معالجة الصورة قبل الفحص

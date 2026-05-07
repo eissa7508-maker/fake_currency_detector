@@ -1,13 +1,13 @@
 from fastapi import FastAPI, File, UploadFile
 import numpy as np
-import tensorflow as tf
 from PIL import Image
 import io
+import tensorflow.lite as tflite
 
 app = FastAPI()
 
-# تحميل الموديل
-interpreter = tf.lite.Interpreter(model_path="currency_model.tflite")
+# تحميل موديل TFLite
+interpreter = tflite.Interpreter(model_path="currency_model.tflite")
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()

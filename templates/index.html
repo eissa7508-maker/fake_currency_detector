@@ -12,18 +12,28 @@
         .upload-area { border: 2px dashed #cbd5e1; padding: 20px; border-radius: 10px; margin: 20px 0; background: #f8fafc; }
         .btn { background-color: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; }
         .btn:hover { background-color: #1d4ed8; }
+        .result { margin-top: 25px; font-weight: bold; font-size: 20px; color: #1e3a8a; border-top: 1px solid #eee; padding-top: 15px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>🔍 نظام كشف العملات</h1>
         <p>ارفع صورة العملة الورقية ليقوم الذكاء الاصطناعي بفحصها</p>
+        
         <form action="/predict" method="post" enctype="multipart/form-data">
             <div class="upload-area">
                 <input type="file" name="file" accept="image/*" required>
             </div>
             <button type="submit" class="btn">بدء الفحص الآن</button>
         </form>
+
+        <!-- هنا تظهر النتيجة بعد الضغط على الزر -->
+        {% if prediction_text %}
+        <div class="result">
+            {{ prediction_text }}
+        </div>
+        {% endif %}
+
     </div>
 </body>
 </html>

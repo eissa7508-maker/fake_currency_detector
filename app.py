@@ -1,51 +1,32 @@
 import os
+from flask import Flask, render_template, request, jsonify
+# إخفاء تنبيهات تنسرفلو المزعجة
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import streamlit as st
-import cv2
-import numpy as np
-from PIL import Image
-from skimage.metrics import structural_similarity as ssim
 
-# إعدادات واجهة الموقع
-st.set_page_config(page_title="نظام كشف العملات المزورة", layout="centered")
+app = Flask(__name__)
 
-st.title("🔍 مشروع التخرج: نظام فحص العملات")
-st.write("قم برفع صورة العملة الأصلية وصورة العملة المراد فحصها للمقارنة")
+# --- المسار الرئيسي (يفتح واجهة الموقع) ---
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-# رفع الصور
-col1, col2 = st.columns(2)
-with col1:
-    ref_file = st.file_uploader("ارفع العملة الأصلية (Reference)", type=['jpg', 'png', 'jpeg'])
-with col2:
-    test_file = st.file_uploader("ارفع العملة للفحص (Test)", type=['jpg', 'png', 'jpeg'])
-
-if ref_file and test_file:
-    # تحويل الملفات المرفوعة إلى صور OpenCV
-    ref_image = Image.open(ref_file)
-    test_image = Image.open(test_file)
+# --- مسار فحص العملة (يستقبل الصورة ويعطي النتيجة) ---
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return "لم يتم رفع أي صورة", 400
     
-    img1 = cv2.cvtColor(np.array(ref_image), cv2.COLOR_RGB2BGR)
-    img2 = cv2.cvtColor(np.array(test_image), cv2.COLOR_RGB2BGR)
-
-    # معالجة الصور (توحيد الحجم والتحويل للرمادي)
-    img1_res = cv2.resize(img1, (600, 300))
-    img2_res = cv2.resize(img2, (600, 300))
+    file = request.files['file']
     
-    gray1 = cv2.cvtColor(img1_res, cv2.COLOR_BGR2GRAY)
-    gray2 = cv2.cvtColor(img2_res, cv2.COLOR_BGR2GRAY)
+    if file.filename == '':
+        return "اسم الملف فارغ", 400
 
-    # تنفيذ خوارزمية المقارنة
-    score, diff = ssim(gray1, gray2, full=True)
+    if file:
+        # هنا سيتم وضع كود تشغيل النموذج الخاص بك مستقبلاً
+        # حالياً سنقوم بإرجاع رسالة تجريبية للتأكد من نجاح الربط
+        return render_template('index.html', prediction_text="جاري فحص العملة... (هنا ستظهر النتيجة لاحقاً)")
 
-    # عرض النتائج
-    st.divider()
-    st.subheader(f"نتيجة التطابق: {score * 100:.2f}%")
-
-    if score > 0.85:
-        st.success("✅ النتيجة: العملة تبدو سليمة")
-    else:
-        st.error("🚨 النتيجة: تحذير! هناك اختلاف كبير، العملة قد تكون مزورة")
-
-    # عرض صور الاختلافات
-    diff = (diff * 255).astype("uint8")
-    st.image(diff, caption="خريطة الاختلافات (المناطق المظلمة تعني اختلافاً)", use_column_width=True)
+if __name__ == '__main__':
+    # تأكد من استخدام المنفذ 5000 أو المنفذ الذي يحدده Render تلقائياً
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
